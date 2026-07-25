@@ -1,0 +1,8 @@
+{
+  "name": "food-manager",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.21.0",
+    "better-sqlite3": "^11.6.0"
+  }
+}

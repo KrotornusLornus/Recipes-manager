@@ -1,9 +1,17 @@
+/*
+  Recipes:
+    name: string
+    ingredients: [ { name: string, proportion: number } ]
+    active: boolean
+    image: string | null
+*/
 export class Recipes {
 
-  constructor(name, ingredients, active = false) {
+  constructor(name, ingredients, active = false, image = null) {
     this.name = name
     this.ingredients = ingredients
     this.active = active
+    this.image = image
   }
 
   changeActive() {

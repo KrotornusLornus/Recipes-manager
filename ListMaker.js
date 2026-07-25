@@ -1,8 +1,8 @@
-import Recipes from './Recipes.js'
+import { Recipes } from './Recipes.js'
 
 export class ListMaker {
 
-  static notDuplicate(...recipes) {
+  static notDuplicate(recipes) {
     const allNames = recipes.flatMap(r => r.listIngredients())
     return [...new Set(allNames)]
   }
