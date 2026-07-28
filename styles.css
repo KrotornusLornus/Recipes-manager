@@ -1,0 +1,180 @@
+:root {
+  --primary: #4ecdc4;
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --text: #e0e0e0;
+  --muted: #888;
+  --radius: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+
+#add-recipe {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+}
+#recipes-panel {
+  flex: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+#recipes-panel > h2 {
+  grid-column: 1 / -1;
+}
+#recipes-panel article {
+  background: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+#recipes-panel article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+#recipes-panel article h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+#recipes-panel article ul {
+  list-style: disc inside;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+#recipes-panel article button {
+  margin-right: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #444;
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+#recipes-panel article button:last-child { color: #e74c3c; border-color: #e74c3c; }
+
+.btn-view {
+  width: 100%;
+  margin-top: 0.5rem;
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+}
+
+#list-active-ingredients {
+  flex: 1;
+  background: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-self: flex-start;
+  position: sticky;
+  top: 1rem;
+}
+#list-active-ingredients h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+#list-active-ingredients ul {
+  list-style: none;
+}
+#list-active-ingredients li {
+  margin-bottom: 0.3rem;
+}
+
+dialog {
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  background: var(--card);
+  color: var(--text);
+  margin: auto;
+}
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+dialog::backdrop {
+  background: rgba(0,0,0,0.6);
+}
+dialog input {
+  width: 100%;
+  padding: 0.4rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #444;
+  border-radius: var(--radius);
+  background: #1a1a2e;
+  color: var(--text);
+}
+dialog .ing-row {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+dialog .ing-row input {
+  margin-bottom: 0;
+}
+dialog button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #444;
+  border-radius: var(--radius);
+  background: #1a1a2e;
+  color: var(--text);
+  cursor: pointer;
+  margin-right: 0.3rem;
+}
+dialog button[type="submit"] {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+dialog.recipe-detail {
+  max-width: 600px;
+  width: 90%;
+}
+dialog.recipe-detail img {
+  max-width: 100%;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+dialog.recipe-detail ul {
+  list-style: disc inside;
+  margin-bottom: 1rem;
+}
+dialog.recipe-detail .btn-toggle {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+dialog.recipe-detail .btn-delete {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}

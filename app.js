@@ -1,149 +1,111 @@
 import { Recipes } from './Recipes.js'
-import { ListMaker } from './ListMaker.js'
-
+import { fetchRecipes, postRecipes, putRecipes, deleteRecipes } from './api.js'
+import { renderMainPage, renderRecipeDetail, renderForm } from './views.js'
 
 const addRecipe = document.getElementById('add-recipe')
-addRecipe.addEventListener('click', () => {
-document.getElementById('form-dialog').showModal()
-})
+const panel = document.getElementById('recipes-panel')
+const listSection = document.getElementById('list-active-ingredients')
 
+// ---- Form helpers ----
 
-const cancelBtn = document.getElementById('cancel-btn')
-cancelBtn.addEventListener('click', () => {
-    document.getElementById('form-dialog').close()
-  })
-
-
-
-const recipeForm = document.getElementById('recipe-form')
-recipeForm.addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const ok = await submitRecipe()
-  if (ok) {
-    document.getElementById('form-dialog').close()
-    loadRecipes()
-  }
-})
-
-const addBtn = document.getElementById('add-ingredient')
-const container = document.getElementById('ingredients-container')
-
-addBtn.addEventListener('click', () => {
-  const firstRow = container.querySelector('.ing-row')
-  const newRow = firstRow.cloneNode(true)
-  newRow.querySelectorAll('input').forEach(input => input.value = '')
-  container.appendChild(newRow)
-})
-
-
-
-
-
-
-
-
-function recipeView(recipe) {
-  const article = document.createElement('article')
-  article.id = `recipe-${recipe.dbId}`
-
-  if (recipe.image) {
-    const img = document.createElement('img')
-    img.src = recipe.image
-    img.alt = recipe.name
-    article.appendChild(img)
-  }
-
-  const h2 = document.createElement('h2')
-  h2.textContent = recipe.name
-  article.appendChild(h2)
-
-  const ul = document.createElement('ul')
-  recipe.ingredients.forEach(i => {
-    const li = document.createElement('li')
-    li.textContent = i.name
-    ul.appendChild(li)
-  })
-  article.appendChild(ul)
-
-  const toggle = document.createElement('button')
-  toggle.textContent = recipe.active ? 'Desactivar' : 'Activar'
-  toggle.addEventListener('click', async () => {
-    await fetch(`/api/recipes/${recipe.dbId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: recipe.name,
-        ingredients: recipe.ingredients,
-        image: recipe.image,
-        active: !recipe.active
-      })
-    })
-    loadRecipes()
-  })
-  article.appendChild(toggle)
-
-  const del = document.createElement('button')
-  del.textContent = 'Eliminar'
-  del.addEventListener('click', async () => {
-    await fetch(`/api/recipes/${recipe.dbId}`, { method: 'DELETE' })
-    loadRecipes()
-  })
-  article.appendChild(del)
-
-  return article
-}
-
-
-
-function listView(ingredientNames) {
-  const ul = document.getElementById('list-ingredients')
-  ul.innerHTML = ''
-  ingredientNames.forEach(name => {
-    const li = document.createElement('li')
-    li.innerHTML = `<input type="checkbox" id="ing-${name}"> <label for="ing-${name}">${name}</label>`
-    ul.appendChild(li)
-  })
-}
-
-async function submitRecipe() {
+function collectIngredients() {
   const ingredients = []
   document.querySelectorAll('.ing-row').forEach(row => {
     const inputs = row.querySelectorAll('input')
     ingredients.push({
       name: inputs[0].value,
-      proportion: parseFloat(inputs[1].value)
+      unit: 'g',
+      quantity: parseFloat(inputs[1].value)
     })
   })
+  return ingredients
+}
 
-  const res = await fetch('/api/recipes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: document.querySelector('[name="recipe-name"]').value,
-      ingredients,
-      image: document.querySelector('[name="recipe-image"]').value || null,
-      active: false
+function extractRecipe() {
+  return {
+    name: document.querySelector('[name="recipe-name"]').value,
+    ingredients: collectIngredients(),
+    image: document.querySelector('[name="recipe-image"]').value || null,
+    active: false
+  }
+}
+
+// ---- Page orchestration ----
+
+let recipes = []
+
+async function loadPage() {
+  recipes = await fetchRecipes()
+
+  const cardDataList = recipes.map(r => ({
+    id: r.dbId,
+    image: r.image,
+    name: r.name
+  }))
+
+  const activeNames = Recipes.notDuplicate(recipes.filter(r => r.active))
+
+  renderMainPage(panel, listSection, cardDataList, activeNames)
+}
+
+// ---- Page events ----
+
+panel.addEventListener('click', async (e) => {
+  const article = e.target.closest('article')
+  if (!article) return
+
+  const id = Number(article.id.replace('recipe-', ''))
+  const recipe = recipes.find(r => r.dbId === id)
+  if (!recipe) return
+
+  if (e.target.matches('.btn-view')) {
+    const { dialog, toggleBtn, deleteBtn, closeBtn } = renderRecipeDetail({
+      image: recipe.image,
+      name: recipe.name,
+      ingredients: recipe.ingredients,
+      active: recipe.active
     })
-  })
+    document.body.appendChild(dialog)
+    dialog.showModal()
 
-  return res.ok
-}
+    closeBtn.addEventListener('click', () => dialog.close())
 
-async function loadRecipes() {
-  const res = await fetch('/api/recipes')
-  const data = await res.json()
-  const recipes = data.map(r => {
-    const recipe = new Recipes(r.name, r.ingredients, r.active, r.image)
-    recipe.dbId = r.id
-    return recipe
-  })
+    toggleBtn.addEventListener('click', async () => {
+      recipe.toggleActive()
+      await putRecipes(recipe.dbId, { name: recipe.name, ingredients: recipe.ingredients, image: recipe.image, active: recipe.active })
+      dialog.close()
+    })
 
-  const panel = document.getElementById('recipes-panel')
-  panel.querySelectorAll('article').forEach(a => a.remove())
-  recipes.forEach(r => panel.appendChild(recipeView(r)))
+    deleteBtn.addEventListener('click', async () => {
+      await deleteRecipes(recipe.dbId)
+      dialog.close()
+    })
 
-  const active = recipes.filter(r => r.active)
-  listView(ListMaker.notDuplicate(active))
-}
+    dialog.addEventListener('close', () => {
+      dialog.remove()
+      loadPage()
+    })
+  }
+})
 
-loadRecipes()
+// ---- Form events ----
+
+const { dialog, form, cancelBtn, addIngredientBtn, addRow } = renderForm()
+document.body.appendChild(dialog)
+
+addRecipe.addEventListener('click', () => dialog.showModal())
+cancelBtn.addEventListener('click', () => dialog.close())
+form.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const data = extractRecipe()
+  const id = await postRecipes(data)
+  if (id) {
+    dialog.close()
+    loadPage()
+  }
+})
+addIngredientBtn.addEventListener('click', addRow)
+
+// ---- Start ----
+
+loadPage()

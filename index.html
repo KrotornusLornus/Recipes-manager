@@ -5,14 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recipe Manager</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-		
+
   <h1 id="titulo">Recipe Manager</h1>
 
 <button id="add-recipe">Añadir receta</button>
 
+<div class="layout">
 <section id="recipes-panel">
 
   <h2>Mis recetas:</h2>
@@ -22,41 +24,10 @@
 
 <section id="list-active-ingredients">
   <h2>Ingredientes activos:</h2>
-  <ul id="list-ingredients"></ul>
 </section>
-
-
-
-
-
-
-<dialog id="form-dialog">
-<form id="recipe-form">
-  <input name="recipe-name" placeholder="Nombre" required>
-  <input name="recipe-image" type="url" placeholder="URL de imagen">
-
-  <div id="ingredients-container">
-    <!-- fila inicial ya visible -->
-    <div class="ing-row">
-      <input name="ing-name" placeholder="Ingrediente" required>
-      <input name="ing-prop" type="number" placeholder="Proporción" step="0.01" required>
-    </div>
-  </div>
-
-  <button type="button" id="add-ingredient">+ Añadir ingrediente</button>
-
-  <button type="submit">Guardar</button>
-  <button type="button" id="cancel-btn">Cancelar</button>
-</form>
-</dialog>
-
-
+</div>
 
 <script src="app.js" type="module"></script>
 </body>
 
 </html>
-
-
-
-
