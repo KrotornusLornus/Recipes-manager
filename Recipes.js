@@ -29,6 +29,15 @@ export class Recipes {
     return [...new Set(allNames)]
   }
 
+  static scaleProportionally(ingredients, changedIndex, newQuantity) {
+    const scale = newQuantity / ingredients[changedIndex].quantity
+    return ingredients.map((i, idx) => ({
+      name: i.name,
+      unit: i.unit,
+      quantity: idx === changedIndex ? newQuantity : +(i.quantity * scale).toFixed(2)
+    }))
+  }
+
 
 
 }
