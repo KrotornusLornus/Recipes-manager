@@ -49,4 +49,4 @@ app.delete('/api/recipes/:id', (req, res) => {
   res.json({ message: 'ok' })
 })
 
-app.listen(3000, () => console.log('Server at http://localhost:3000'))
+app.listen(process.env.PORT || 3000, () => console.log('Server at http://localhost:' + (process.env.PORT || 3000)))

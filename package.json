@@ -1,6 +1,9 @@
 {
   "name": "food-manager",
   "type": "module",
+  "scripts": {
+    "start": "node Server.js"
+  },
   "dependencies": {
     "express": "^4.21.0",
     "better-sqlite3": "^11.6.0"
